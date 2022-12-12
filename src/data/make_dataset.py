@@ -40,10 +40,4 @@ for cat in statcategory:
 
 #-------------------------------------------------------------------------------------------------#
 
-# Goals:
-# 1. Make functions to organize the code
-# 2. Separate data-stat attributes from the rest
-# 3. Create player objects to house all of the data for each player
-# 4. Scrape data from table and put in player objects
-    # use find(attrs={'data-stat':'STATTYPE'}) to extract data
 
