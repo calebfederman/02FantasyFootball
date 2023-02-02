@@ -1,6 +1,8 @@
 #-------------------------------------------------------------------------------------------------#
-# Starter file for fantasy football data analysis project
-# Caleb Federman
+# make_dataset.py makes the datasets of fantasy football player stats by year, taken from 
+# footballdb.com, and stores them in .csv files in 
+#
+# Author: Caleb Federman
 #-------------------------------------------------------------------------------------------------#
 
 import requests
@@ -39,14 +41,9 @@ class Year:
 
 current_year = 2022
 
-years = []
-
-outdir = './raw'
-
 for x in range(2010,current_year+1):
     data_frame = get_df(f"https://www.footballdb.com/fantasy-football/index.html?pos=OFF&yr={x}&wk=all&key=b6406b7aea3872d5bb677f064673c57f")
-    data_frame.to_csv(f'./data/raw/{x}.csv', index=False)
-    years.append(Year(x,data_frame))
+    data_frame.to_csv(f'./data/raw/r{x}.csv', index=False)
 
 #-------------------------------------------------------------------------------------------------#
 
