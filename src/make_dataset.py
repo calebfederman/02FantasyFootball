@@ -13,8 +13,6 @@ import pandas as pd
 #   Function: get_df()
 #   Description: Gets dataframe from HTML table at given URL
 #   Arguments: URL - url of the web page where the table resides
-#
-#   Note: in order to use for other tables, need to change class in soup.find_all() function
 #-------------------------------------------------------------------------------------------------#
 def get_df(URL):
 
@@ -23,7 +21,7 @@ def get_df(URL):
     soup = BeautifulSoup(response.text, "html.parser")
 
     # find table
-    table = soup.find_all("table",{"class":"statistics scrollable"})
+    table = soup.find_all("table",{"class":"statistics scrollable"}) # Note: in order to use for other tables need to change class
 
     data_frame = pd.read_html(str(table))[0]
 
@@ -40,10 +38,19 @@ class Year:
 #-------------------------------------------------------------------------------------------------#
 
 current_year = 2022
+positions = ['QB','RB','WR','TE']
+
+c = 0
 
 for x in range(2010,current_year+1):
-    data_frame = get_df(f"https://www.footballdb.com/fantasy-football/index.html?pos=OFF&yr={x}&wk=all&key=b6406b7aea3872d5bb677f064673c57f")
-    data_frame.to_csv(f'./data/raw/r{x}.csv', index=False)
+    for p in positions:
+        data_frame = get_df(f"https://www.footballdb.com/fantasy-football/index.html?pos={p}&yr={x}&wk=all&key=b6406b7aea3872d5bb677f064673c57f")
+        data_frame['Pos'] = p
+        if c == 0:
+            data_frame.to_csv(f'./data/raw/rTotal.csv', index=False)
+        else:
+            data_frame.to_csv(f'./data/raw/rTotal.csv', mode='a', header=False, index=False)
+        c+=1
 
 #-------------------------------------------------------------------------------------------------#
 
