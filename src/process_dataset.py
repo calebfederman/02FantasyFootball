@@ -57,6 +57,12 @@ def clean_data(current_year):
 
         #-----------------------------------------------------------#
 
+        # adjust point totals to 4pt passing TDs
+        pts = []
+        for ind in df.index:
+                pts.append(round((df.loc[ind].at['passYds'] * 0.04) + (df.loc[ind].at['passTD'] * 4) - (df.loc[ind].at['passInt'] * 2) + (df.loc[ind].at['pass2pt'] * 2) + (df.loc[ind].at['rushYds'] * 0.1) + (df.loc[ind].at['rushTD'] * 6) + (df.loc[ind].at['ru2pt'] * 2) + (df.loc[ind].at['rec'] * 1) + (df.loc[ind].at['recYds'] * 0.1) + (df.loc[ind].at['recTD'] * 6) + (df.loc[ind].at['rec2pt'] * 2) - (df.loc[ind].at['FL'] * 2), 1))
+        df.Pts = pts
+
         # sort by descending point totals
         df = df.sort_values(by='Pts', ascending=False)
 
