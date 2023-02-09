@@ -1,10 +1,13 @@
 #-------------------------------------------------------------------------------------------------#
-# process_dataset.py processes and cleans the fantasy football dataset scraped by make_dataset.py
+# clean_dataset.py holds the functions that process and clean the fantasy football dataset 
+# scraped by scrape_dataset.py
 #
 # Author: Caleb Federman
 #-------------------------------------------------------------------------------------------------#
 
 import pandas as pd
+import datetime
+import os
 
 #-------------------------------------------------------------------------------------------------#
 #   Function: clean_data()
@@ -12,14 +15,17 @@ import pandas as pd
 #   Arguments: URL - url of the web page where the table resides
 #-------------------------------------------------------------------------------------------------#
 
-def clean_data(current_year):
+def clean_data():
 
-    files = list(range(2010,current_year+1))
+    files = list(range(2010,datetime.date.today().year+1))
     files.append('Total')
 
     for x in files:
 
         df = pd.read_csv(f"./data/raw/r{x}.csv")
+        if (len(df.index)<5):
+                os.remove(f"./data/raw/r{x}.csv")
+                continue
 
         #-----------------------------------------------------------#
 
@@ -50,7 +56,7 @@ def clean_data(current_year):
         # convert types where necessary
 
         df = df.astype({'Pts':'float'})
-        df = df.astype({'Pts':'int','passAtt':'int','passCmp':'int','passYds':'int','passTD':'int','passInt':'int',
+        df = df.astype({'passAtt':'int','passCmp':'int','passYds':'int','passTD':'int','passInt':'int',
                         'pass2pt':'int','rushAtt':'int','rushYds':'int','rushTD':'int','ru2pt':'int',
                         'rec':'int','recYds':'int','recTD':'int','rec2pt':'int','FL':'int','FLTD':'int'})
         df = df.astype({'Player':'string'})
@@ -71,7 +77,8 @@ def clean_data(current_year):
                                  (df.loc[ind].at['recYds'] * 0.1) +     # 10 rec yds / pt
                                  (df.loc[ind].at['recTD'] * 6) +        # 6 pts / rec TD
                                  (df.loc[ind].at['rec2pt'] * 2) -       # 2 pts / two point conversion
-                                 (df.loc[ind].at['FL'] * 2), 1))        # -2 pts / fumble lost
+                                 (df.loc[ind].at['FL'] * 2)             # -2 pts / fumble lost
+                                                                ,1))    # round to nearest tenth
         df.Pts = pts
 
         # sort by descending point totals
@@ -82,5 +89,3 @@ def clean_data(current_year):
         df.to_csv(f'./data/processed/p{x}.csv', index=False)
 
 #-------------------------------------------------------------------------------------------------#
-
-clean_data(2022)

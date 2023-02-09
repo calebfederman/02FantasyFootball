@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------------------------#
-# make_dataset.py makes the datasets of fantasy football player stats by year, taken from 
-# footballdb.com, and stores them in .csv files in 
+# scrape_dataset.py holds the functions that make the datasets of fantasy football player 
+# stats by year, scraped from footballdb.com, and stores them in .csv files
 #
 # Author: Caleb Federman
 #-------------------------------------------------------------------------------------------------#
@@ -8,6 +8,7 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import datetime
 
 #-------------------------------------------------------------------------------------------------#
 #   Function: get_df()
@@ -22,9 +23,9 @@ def get_df(URL):
 
     table = soup.find_all("table",{"class":"statistics scrollable"}) # Note: in order to use for other tables need to change class
 
-    data_frame = pd.read_html(str(table))[0]
+    df = pd.read_html(str(table))[0]
 
-    return(data_frame)
+    return(df)
 
 
 #-------------------------------------------------------------------------------------------------#
@@ -33,30 +34,28 @@ def get_df(URL):
 #   Arguments: current_year - year of the most recent NFL season
 #-------------------------------------------------------------------------------------------------#
 
-def create_raw_csvs(current_year):
+def create_raw_csvs():
 
     positions = ['QB','RB','WR','TE']
     c = 0
 
-    for x in range(2010,current_year+1):
+    for x in range(2010,datetime.date.today().year+1):
         for p in positions:
 
-            data_frame = get_df(f"https://www.footballdb.com/fantasy-football/index.html?pos={p}&yr={x}&wk=all&key=b6406b7aea3872d5bb677f064673c57f")
-            data_frame['Pos'] = p
+            df = get_df(f"https://www.footballdb.com/fantasy-football/index.html?pos={p}&yr={x}&wk=all&key=b6406b7aea3872d5bb677f064673c57f")
+            df['Pos'] = p
 
             # yearly csv
             if p == 'QB':
-                data_frame.to_csv(f'./data/raw/r{x}.csv', index=False)
+                df.to_csv(f'./data/raw/r{x}.csv', index=False)
             else: 
-                data_frame.to_csv(f'./data/raw/r{x}.csv', mode='a', header=False, index = False)
+                df.to_csv(f'./data/raw/r{x}.csv', mode='a', header=False, index = False)
 
             # total csv
             if c == 0:
-                data_frame.to_csv(f'./data/raw/rTotal.csv', index=False)
+                df.to_csv(f'./data/raw/rTotal.csv', index=False)
             else:
-                data_frame.to_csv(f'./data/raw/rTotal.csv', mode='a', header=False, index=False)
+                df.to_csv(f'./data/raw/rTotal.csv', mode='a', header=False, index=False)
             c+=1
 
 #-------------------------------------------------------------------------------------------------#
-
-create_raw_csvs(2022)
