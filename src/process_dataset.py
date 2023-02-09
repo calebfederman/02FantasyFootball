@@ -57,10 +57,21 @@ def clean_data(current_year):
 
         #-----------------------------------------------------------#
 
-        # adjust point totals to 4pt passing TDs
+        # adjust point totals to account for the following scoring system
         pts = []
         for ind in df.index:
-                pts.append(round((df.loc[ind].at['passYds'] * 0.04) + (df.loc[ind].at['passTD'] * 4) - (df.loc[ind].at['passInt'] * 2) + (df.loc[ind].at['pass2pt'] * 2) + (df.loc[ind].at['rushYds'] * 0.1) + (df.loc[ind].at['rushTD'] * 6) + (df.loc[ind].at['ru2pt'] * 2) + (df.loc[ind].at['rec'] * 1) + (df.loc[ind].at['recYds'] * 0.1) + (df.loc[ind].at['recTD'] * 6) + (df.loc[ind].at['rec2pt'] * 2) - (df.loc[ind].at['FL'] * 2), 1))
+                pts.append(round((df.loc[ind].at['passYds'] * 0.04) +   # 25 pass yds / pt
+                                 (df.loc[ind].at['passTD'] * 4) -       # 4 pts / pass TD
+                                 (df.loc[ind].at['passInt'] * 2) +      # -2 pts / interception
+                                 (df.loc[ind].at['pass2pt'] * 2) +      # 2 pts / two point conversion
+                                 (df.loc[ind].at['rushYds'] * 0.1) +    # 10 rush yds / pt
+                                 (df.loc[ind].at['rushTD'] * 6) +       # 6 pts / rush TD
+                                 (df.loc[ind].at['ru2pt'] * 2) +        # 2 pts / two point conversion
+                                 (df.loc[ind].at['rec'] * 1) +          # 1 ppr
+                                 (df.loc[ind].at['recYds'] * 0.1) +     # 10 rec yds / pt
+                                 (df.loc[ind].at['recTD'] * 6) +        # 6 pts / rec TD
+                                 (df.loc[ind].at['rec2pt'] * 2) -       # 2 pts / two point conversion
+                                 (df.loc[ind].at['FL'] * 2), 1))        # -2 pts / fumble lost
         df.Pts = pts
 
         # sort by descending point totals
