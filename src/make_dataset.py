@@ -49,6 +49,7 @@ def create_raw_csvs():
 
             df = get_df(f"https://www.footballdb.com/fantasy-football/index.html?pos={p}&yr={x}&wk=all&key=b6406b7aea3872d5bb677f064673c57f")
             df['Pos'] = p
+            df['Year'] = x
 
             # yearly csv
             if p == 'QB':
@@ -87,13 +88,13 @@ def clean_data():
 
         # rename columns
         columns = ['Player','Bye','Pts','passAtt','passCmp','passYds','passTD','passInt','pass2pt',
-                'rushAtt','rushYds','rushTD','ru2pt','rec','recYds','recTD','rec2pt','FL','FLTD','Pos']
+                'rushAtt','rushYds','rushTD','ru2pt','rec','recYds','recTD','rec2pt','FL','FLTD','Pos','Year']
         df.columns = columns
 
         #-----------------------------------------------------------#
 
-        # add position column and move it to second from far left
-        df = df[['Player','Pos','Bye','Pts','passAtt','passCmp','passYds','passTD','passInt','pass2pt',
+        # move Year and Pos columns to be right after Player
+        df = df[['Player','Year','Pos','Bye','Pts','passAtt','passCmp','passYds','passTD','passInt','pass2pt',
                 'rushAtt','rushYds','rushTD','ru2pt','rec','recYds','recTD','rec2pt','FL','FLTD']]
 
         #-----------------------------------------------------------#
@@ -103,38 +104,40 @@ def clean_data():
 
         #-----------------------------------------------------------#
 
-        # cut off second iteration of player names
-        for ind in df.index:
-            df.loc[ind].at['Player'] = df.loc[ind].at['Player'][:df.loc[ind].at['Player'].rfind(df.loc[ind].at['Player'][0]+'.')]
-
         #-----------------------------------------------------------#
 
         # convert types where necessary
 
         df = df.astype({'Pts':'float'})
-        df = df.astype({'passAtt':'int','passCmp':'int','passYds':'int','passTD':'int','passInt':'int',
+        df = df.astype({'Year':'int','passAtt':'int','passCmp':'int','passYds':'int','passTD':'int','passInt':'int',
                         'pass2pt':'int','rushAtt':'int','rushYds':'int','rushTD':'int','ru2pt':'int',
                         'rec':'int','recYds':'int','recTD':'int','rec2pt':'int','FL':'int','FLTD':'int'})
         df = df.astype({'Player':'string'})
 
         #-----------------------------------------------------------#
 
-        # adjust point totals to account for the following scoring system
+        
         pts = []
+        names = []
         for ind in df.index:
-                pts.append(round((df.loc[ind].at['passYds'] * 0.04) +   # 25 pass yds / pt
-                                 (df.loc[ind].at['passTD'] * 4) -       # 4 pts / pass TD
-                                 (df.loc[ind].at['passInt'] * 2) +      # -2 pts / interception
-                                 (df.loc[ind].at['pass2pt'] * 2) +      # 2 pts / two point conversion
-                                 (df.loc[ind].at['rushYds'] * 0.1) +    # 10 rush yds / pt
-                                 (df.loc[ind].at['rushTD'] * 6) +       # 6 pts / rush TD
-                                 (df.loc[ind].at['ru2pt'] * 2) +        # 2 pts / two point conversion
-                                 (df.loc[ind].at['rec'] * 1) +          # 1 ppr
-                                 (df.loc[ind].at['recYds'] * 0.1) +     # 10 rec yds / pt
-                                 (df.loc[ind].at['recTD'] * 6) +        # 6 pts / rec TD
-                                 (df.loc[ind].at['rec2pt'] * 2) -       # 2 pts / two point conversion
-                                 (df.loc[ind].at['FL'] * 2)             # -2 pts / fumble lost
-                                                                ,1))    # round to nearest tenth
+            # cut off second iteration of player names
+            names.append(df.loc[ind].at['Player'][:df.loc[ind].at['Player'].rfind(df.loc[ind].at['Player'][0]+'.')])
+
+            # adjust point totals to account for the following scoring system
+            pts.append(round((df.loc[ind].at['passYds'] * 0.04) +   # 25 pass yds / pt
+                                (df.loc[ind].at['passTD'] * 4) -       # 4 pts / pass TD
+                                (df.loc[ind].at['passInt'] * 2) +      # -2 pts / interception
+                                (df.loc[ind].at['pass2pt'] * 2) +      # 2 pts / two point conversion
+                                (df.loc[ind].at['rushYds'] * 0.1) +    # 10 rush yds / pt
+                                (df.loc[ind].at['rushTD'] * 6) +       # 6 pts / rush TD
+                                (df.loc[ind].at['ru2pt'] * 2) +        # 2 pts / two point conversion
+                                (df.loc[ind].at['rec'] * 1) +          # 1 ppr
+                                (df.loc[ind].at['recYds'] * 0.1) +     # 10 rec yds / pt
+                                (df.loc[ind].at['recTD'] * 6) +        # 6 pts / rec TD
+                                (df.loc[ind].at['rec2pt'] * 2) -       # 2 pts / two point conversion
+                                (df.loc[ind].at['FL'] * 2)             # -2 pts / fumble lost
+                                                            ,1))    # round to nearest tenth
+        df.Player = names
         df.Pts = pts
 
         # sort by descending point totals
