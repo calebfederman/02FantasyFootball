@@ -1,8 +1,11 @@
 #-------------------------------------------------------------------------------------------------#
-# create_dataset.py calls the functions to scrape and clean the dataset in order to have
-# clean data for analysis
+# File:         make_dataset.py
+# 
+# Description:  Provides all functionality for scraping and cleaning the dataset. 
+#               For this project, the data is fantasy football statistics from 2010 
+#               up to the most recent NFL season.
 #
-# Author: Caleb Federman
+# Author:       Caleb Federman
 #-------------------------------------------------------------------------------------------------#
 
 import requests
