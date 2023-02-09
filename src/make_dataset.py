@@ -20,37 +20,43 @@ def get_df(URL):
     response = requests.get(URL, headers=headers)
     soup = BeautifulSoup(response.text, "html.parser")
 
-    # find table
     table = soup.find_all("table",{"class":"statistics scrollable"}) # Note: in order to use for other tables need to change class
 
     data_frame = pd.read_html(str(table))[0]
 
     return(data_frame)
 
-#-------------------------------------------------------------------------------------------------#
-
-# class to create Year objects which store the year and corresponding dataframe
-class Year:
-    def __init__(self, year, df):
-        self.year = year
-        self.df = df
 
 #-------------------------------------------------------------------------------------------------#
+#   Function: create_raw_csvs()
+#   Description: Creates raw csv files from dataframes
+#   Arguments: current_year - year of the most recent NFL season
+#-------------------------------------------------------------------------------------------------#
 
-current_year = 2022
-positions = ['QB','RB','WR','TE']
+def create_raw_csvs(current_year):
 
-c = 0
+    positions = ['QB','RB','WR','TE']
+    c = 0
 
-for x in range(2010,current_year+1):
-    for p in positions:
-        data_frame = get_df(f"https://www.footballdb.com/fantasy-football/index.html?pos={p}&yr={x}&wk=all&key=b6406b7aea3872d5bb677f064673c57f")
-        data_frame['Pos'] = p
-        if c == 0:
-            data_frame.to_csv(f'./data/raw/rTotal.csv', index=False)
-        else:
-            data_frame.to_csv(f'./data/raw/rTotal.csv', mode='a', header=False, index=False)
-        c+=1
+    for x in range(2010,current_year+1):
+        for p in positions:
+
+            data_frame = get_df(f"https://www.footballdb.com/fantasy-football/index.html?pos={p}&yr={x}&wk=all&key=b6406b7aea3872d5bb677f064673c57f")
+            data_frame['Pos'] = p
+
+            # yearly csv
+            if p == 'QB':
+                data_frame.to_csv(f'./data/raw/r{x}.csv', index=False)
+            else: 
+                data_frame.to_csv(f'./data/raw/r{x}.csv', mode='a', header=False, index = False)
+
+            # total csv
+            if c == 0:
+                data_frame.to_csv(f'./data/raw/rTotal.csv', index=False)
+            else:
+                data_frame.to_csv(f'./data/raw/rTotal.csv', mode='a', header=False, index=False)
+            c+=1
 
 #-------------------------------------------------------------------------------------------------#
 
+create_raw_csvs(2022)
