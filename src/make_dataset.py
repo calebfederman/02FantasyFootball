@@ -12,7 +12,9 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import datetime
+import time
 import os
+import re
 
 #-------------------------------------------------------------------------------------------------#
 #   Function: get_df()
@@ -28,6 +30,10 @@ def get_df(URL):
     table = soup.find_all("table",{"class":"statistics scrollable"}) # Note: in order to use for other tables need to change class
 
     df = pd.read_html(str(table))[0]
+
+    player_ids = re.findall(r'(?<=\"/players/)(.*?)(?=\")',str(table), re.IGNORECASE)
+
+    df["ID"] = player_ids[1::2]
 
     return(df)
 
@@ -88,14 +94,14 @@ def clean_data():
 
         # rename columns
         columns = ['Player','Bye','Pts','passAtt','passCmp','passYds','passTD','passInt','pass2pt',
-                'rushAtt','rushYds','rushTD','ru2pt','rec','recYds','recTD','rec2pt','FL','FLTD','Pos','Year']
+                'rushAtt','rushYds','rushTD','ru2pt','rec','recYds','recTD','rec2pt','FL','FLTD','ID','Pos','Year']
         df.columns = columns
 
         #-----------------------------------------------------------#
 
         # move Year and Pos columns to be right after Player
         df = df[['Player','Year','Pos','Bye','Pts','passAtt','passCmp','passYds','passTD','passInt','pass2pt',
-                'rushAtt','rushYds','rushTD','ru2pt','rec','recYds','recTD','rec2pt','FL','FLTD']]
+                'rushAtt','rushYds','rushTD','ru2pt','rec','recYds','recTD','rec2pt','FL','FLTD','ID']]
 
         #-----------------------------------------------------------#
 
@@ -112,16 +118,20 @@ def clean_data():
         df = df.astype({'Year':'int','passAtt':'int','passCmp':'int','passYds':'int','passTD':'int','passInt':'int',
                         'pass2pt':'int','rushAtt':'int','rushYds':'int','rushTD':'int','ru2pt':'int',
                         'rec':'int','recYds':'int','recTD':'int','rec2pt':'int','FL':'int','FLTD':'int'})
-        df = df.astype({'Player':'string'})
+        df = df.astype({'Player':'string','ID':'string'})
 
         #-----------------------------------------------------------#
 
         
         pts = []
         names = []
+        ids = []
         for ind in df.index:
             # cut off second iteration of player names
-            names.append(df.loc[ind].at['Player'][:df.loc[ind].at['Player'].rfind(df.loc[ind].at['Player'][0]+'.')])
+            names.append(df.loc[ind].at['Player'][df.loc[ind].at['Player'].rfind(df.loc[ind].at['Player'][0]+'.'):])
+
+            # shorten ID
+            ids.append(df.loc[ind].at['ID'][df.loc[ind].at['ID'].rfind('-')+1:])
 
             # adjust point totals to account for the following scoring system
             pts.append(round((df.loc[ind].at['passYds'] * 0.04) +   # 25 pass yds / pt
@@ -139,6 +149,7 @@ def clean_data():
                                                             ,1))    # round to nearest tenth
         df.Player = names
         df.Pts = pts
+        df.ID = ids
 
         # sort by descending point totals
         df = df.sort_values(by='Pts', ascending=False)
@@ -151,6 +162,10 @@ def clean_data():
 
 # run functions to create the datasets (in the future create shell script to run this?)
 
+start_time = time.time()
+
 create_raw_csvs()
 clean_data()
 
+end_time = time.time()
+print (end_time-start_time,"seconds")
