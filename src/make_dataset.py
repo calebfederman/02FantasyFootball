@@ -128,7 +128,7 @@ def clean_data():
         ids = []
         for ind in df.index:
             # cut off second iteration of player names
-            names.append(df.loc[ind].at['Player'][df.loc[ind].at['Player'].rfind(df.loc[ind].at['Player'][0]+'.'):])
+            names.append(df.loc[ind].at['Player'][:df.loc[ind].at['Player'].rfind(df.loc[ind].at['Player'][0]+'.')])
 
             # shorten ID
             ids.append(df.loc[ind].at['ID'][df.loc[ind].at['ID'].rfind('-')+1:])
