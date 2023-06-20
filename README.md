@@ -6,10 +6,10 @@ A personal introduction to Data Science through analysis of fantasy football dat
 
 SEE : 
 
-src/age_trends.ipynb      https://github.com/calebfederman/fantasy_football_projections/blob/main/src/age_trends.ipynb
+      src/age_trends.ipynb      analysis of historical age trends by position
 
-      analysis of historical age trends by position
+      
 
 NEXT : 
 
-Use historical age trends, recent production (or current year projections), and current age to project players' future outlooks
+      Use historical age trends, recent production (or current year projections), and current age to project players' future outlooks
