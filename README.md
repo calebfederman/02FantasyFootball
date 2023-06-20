@@ -12,4 +12,5 @@ SEE :
 
 NEXT : 
 
-      Use historical age trends, recent production (or current year projections), and current age to project players' future outlooks
+      Use historical age trends, recent production (or current year projections), 
+      and current age to project players' future outlooks
